@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Salary {
+  id        Int      @id @default(autoincrement())
+  memberId  String
+  amount    Decimal  @db.Decimal(12, 2)
+  month     Int
+  year      Int
+  type      String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@unique([memberId, month, year, type])
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  categoryId  String
+  amount      Decimal  @db.Decimal(12, 2)
+  date        DateTime
+  description String
+  isRecurring Boolean  @default(false)
+  paymentType String
+  cardLast4   String?
+  createdAt   DateTime @default(now())
+}
+
+model HouseExpense {
+  id          Int       @id @default(autoincrement())
+  type        String
+  amount      Decimal   @db.Decimal(12, 2)
+  dueDay      Int?
+  isRecurring Boolean   @default(true)
+  month       Int
+  year        Int
+  isPaid      Boolean   @default(false)
+  paidAt      DateTime?
+  notes       String?
+  createdAt   DateTime  @default(now())
+
+  @@unique([type, month, year])
+}
+
+model SavingsDeposit {
+  id        Int      @id @default(autoincrement())
+  goalId    String
+  amount    Decimal  @db.Decimal(12, 2)
+  date      DateTime
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model BankTransaction {
+  id             String   @id
+  source         String
+  sourceType     String
+  date           DateTime
+  description    String
+  chargedAmount  Decimal  @db.Decimal(12, 2)
+  originalAmount Decimal? @db.Decimal(12, 2)
+  type           String
+  categoryId     String?
+  confidence     String   @default("manual")
+  isRecurring    Boolean  @default(false)
+  memo           String?
+  cardLast4      String?
+  importBatchId  String
+  createdAt      DateTime @default(now())
+}
+
+model ImportBatch {
+  id           String   @id @default(uuid())
+  source       String
+  month        Int
+  year         Int
+  fileType     String
+  rowsTotal    Int
+  rowsImported Int
+  rowsSkipped  Int
+  createdAt    DateTime @default(now())
+}
